@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EXCYRUS</title>
+</head>
+<style>
+    fieldset {
+        display: none;
+        max-width: 200px;
+    }
+    #submit, #reset {
+        margin-right: 20px;
+    }
+</style>
+<body>
+    <h2>EXCYRUS PROTOTYPE</h2>
+    <form name="formku">
+        <label for="nama">Nama :</label>
+        <input type="text" id="nama" name="nama" required><br><br>
+
+        <label for="alamat">Alamat :</label>
+        <input type="text" id="alamat" name="alamat" required><br><br>
+
+        <label for="umur">Umur :</label>
+        <input type="number" id="umur" name="umur" required><br><br>
+
+        <label for="JenisKelamin">Jenis Kelamin :</label><br>
+            <input type="radio" name="jk" id="pria" value="Pria">
+            <label for="pria">Pria</label><br>
+            <input type="radio" name="jk" id="Perempuan" value="Perempuan">
+            <label for="laki">Perempuan</label><br><br>
+        <input type="button" value="Kirim" id="submit" onclick="verifyAge(cekForm(this.form))">
+        <input type="button" value="Reset" id="reset" onclick="location.reload()"><br><br>
+        <fieldset id="fieldset"></fieldset>
+    </form>
+
+    <h2>Komentar</h2>
+    <label for="comment">Komentar:</label><br>
+    <textarea id="comment" rows="4" cols="50"></textarea><br><br>
+    <button onclick="submitComment()">Kirim Komentar</button>
+
+    <div id="comments"></div>
+
+<script>
+    var commentsArray = [];
+
+    function cekForm(form) {
+        if (form.elements.nama.value === "") {
+            form.elements.nama.focus()
+            form.elements.nama.select()
+            alert("Nama tidak boleh kosong!")
+            return false;
+        } else if (form.elements.alamat.value === "") {
+            form.elements.alamat.focus()
+            form.elements.alamat.select()
+            alert("Alamat tidak boleh kosong!")
+            return false;
+        } else if (form.elements.umur.value === "") {
+            form.elements.umur.focus()
+            form.elements.umur.select()
+            alert("Umur tidak boleh kosong!")
+            return false;
+        } else if (form.elements.umur.value < 15) {
+            form.elements.umur.focus()
+            form.elements.umur.select()
+            alert("Umur harus minimal 15 tahun!")
+            return false;
+        } else if (form.elements.jk.value === "") {
+            alert("Jenis Kelamin tidak boleh kosong!")
+            return false;
+        }
+
+        var data = {
+            nama: form.elements.nama.value,
+            alamat: form.elements.alamat.value,
+            umur: form.elements.umur.value,
+            jenis_kelamin: form.elements.jk.value
+        }
+        return data;
+    }
+
+    function verifyAge(data) {
+        if (data) {
+            if (data.umur >= 15) {
+                displayData(data);
+            } else {
+                alert("Umur harus minimal 15 tahun untuk mengirim formulir!");
+            }
+        }
+    }
+
+    function displayData(data) {
+        if (data) {
+            var fieldset = document.getElementById("fieldset");
+            fieldset.style.display = "block";
+            fieldset.innerHTML = "Nama: " + data.nama + "<br>Alamat: " + data.alamat + "<br>Umur: " + data.umur + "<br>Jenis Kelamin: " + data.jenis_kelamin + "<br>";
+        }
+    }
+
+    function submitComment() {
+        var comment = document.getElementById("comment").value;
+        var username = document.getElementById("nama").value;
+        if (comment.trim() !== "" && username.trim() !== "") {
+            var commentObject = {
+                username: username,
+                comment: comment,
+                likes: 0,
+                dislikes: 0,
+                replies: []
+            };
+            commentsArray.push(commentObject);
+            displayComments();
+            document.getElementById("comment").value = "";
+        } else {
+            alert("Silakan isi komentar dan nama.");
+        }
+    }
+
+    function displayComments() {
+        var commentsDiv = document.getElementById("comments");
+        commentsDiv.innerHTML = "<h3>Komentar</h3>";
+        for (var i = 0; i < commentsArray.length; i++) {
+            commentsDiv.innerHTML += "<p><strong>" + commentsArray[i].username + ":</strong> " + commentsArray[i].comment + "<br><button onclick='likeComment(" + i + ")'>Like</button> <button onclick='dislikeComment(" + i + ")'>Dislike</button> Likes: " + commentsArray[i].likes + " Dislikes: " + commentsArray[i].dislikes + " <button onclick='replyToComment(" + i + ")'>Reply</button></p>";
+            if (commentsArray[i].replies.length > 0) {
+                commentsDiv.innerHTML += "<ul>";
+                for (var j = 0; j < commentsArray[i].replies.length; j++) {
+                    commentsDiv.innerHTML += "<li><strong>" + commentsArray[i].replies[j].username + ":</strong> " + commentsArray[i].replies[j].comment + "</li>";
+                }
+                commentsDiv.innerHTML += "</ul>";
+            }
+        }
+    }
+
+    function likeComment(index) {
+        commentsArray[index].likes++;
+        displayComments();
+    }
+
+    function dislikeComment(index) {
+        commentsArray[index].dislikes++;
+        displayComments();
+    }
+
+    function replyToComment(index) {
+        var reply = prompt("Masukkan balasan Anda:");
+        var username = document.getElementById("nama").value;
+        if (reply.trim() !== "" && username.trim() !== "") {
+            var replyObject = {
+                username: username,
+                comment: reply
+            };
+            commentsArray[index].replies.push(replyObject);
+            displayComments();
+        } else {
+            alert("Silakan isi balasan dan nama.");
+        }
+    }
+</script>
+</body>
+</html>
